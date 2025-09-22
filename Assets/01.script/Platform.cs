@@ -1,22 +1,40 @@
 using UnityEngine;
 
-
-//발판으로서 필요한 동작을 담은 스크립트
+// 발판으로서 필요한 동작을 담은 스크립트
 public class Platform : MonoBehaviour
 {
-    public GameObject[] objstacles;//장애물 오브젝트들
-    private bool stepped = false;//플레이어 캐릭터가 밟았는가
+    [SerializeField] GameObject[] obstacles; //장애물 오브젝트들
+    bool stepped;//플레이어 캐릭터가 밟았는가
+    int count;//발판에 장애물이 몇 개 있는지 확인목적,
 
-    //컴포넌트가 활성화 될 때마다 매번 실행되는 메서드
     private void OnEnable()
     {
-        //발판을 리셋하는 처리
+        count = 0;//점수 초기화
+        
+        //발판 상태를 리셋
+        stepped = false;
+        //장애물의 수만큼 루프
+        for (int i = 0; i < obstacles.Length; i++)
+        {
+            if (Random.Range(0, 3) == 2)
+            {
+                obstacles[i].SetActive(true);
+                count++;
+                //count = count + 1; count += 1; ++count;
+            }
+            else
+                obstacles[i].SetActive(false);
+        }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    //충돌
+    private void OnCollisionEnter2D(Collision2D coll)
     {
-        //플레이어 캐릭터가 자신을 밟았을 때 점수를 추가하는 처리
+        if (!stepped && coll.transform.tag == "Player")
+        {
+            stepped = true;
+            int newScore = count + 1;
+            GameManager.instance.AddScore(newScore);
+        }
     }
-
-    
 }
